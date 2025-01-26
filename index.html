@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Web Page!</title>
+  </head>
+  <body>
+    <h1>online pong</h1>
+    <canvas
+      id="myCanvas"
+      width="500"
+      height="500"
+      style="background-color: black"
+    ></canvas>
+  </body>
+  <script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    let PLAYER_KEYDOWN = {
+      ArrowUp: false,
+      ArrowDown: false,
+    };
+    let player = {
+        x: 100,
+        y: 0
+    };
+    let ball_info = {
+        x: 250,
+        y: 250,
+        angle: 30,
+    };
+    canvas.fillStyle = "#000000";
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+      myBox();
+      ball();
+    }
+    function myBox() {
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(player.x, player.y, 20, 100);
+      moveMyBox();
+    }
+    function moveMyBox() {
+        if (PLAYER_KEYDOWN.ArrowUp && player.y > 0) {
+          player.y -= 10;
+        }
+        if (PLAYER_KEYDOWN.ArrowDown && player.y < 400) {
+          player.y += 10;
+        }
+    };
+    function ball() {
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(ball_info.x, ball_info.y, 20, 20);
+      moveBall();
+    }
+    function moveBall() {
+        if ( ball_info.x > 480 ) {
+            ball_info.angle = -ball_info.angle;
+        }
+        if (ball_info.y > 480 || ball_info.y < 0) {
+            ball_info.angle = 180 - ball_info.angle;
+        };
+        ball_collide();
+
+        let angle = ball_info.angle * (Math.PI / 180);
+        let anglePlus = 90 * (Math.PI / 180);
+        ball_info.y += Math.cos(angle + anglePlus) * 10;
+        ball_info.x += Math.sin(angle) * 10;
+    };
+    function ballAngleCorrection() {
+        if (ball_info.angle >= 360 )
+            ball_info.angle = ball_info.angle - Math.trunc(ball_info.angle / 360)
+    };
+    function ball_collide() {
+        if ( player.x + 20 >= ball_info.x && player.x <= ball_info.x ) {
+            if( player.y <= ball_info.y && player.y + 100 >= ball_info.y ){
+                const angle = (90 + (player.y + 50) - ball_info.y) * (Math.PI / 180);
+                console.log(Math.sin(angle) * 90 + 180);
+                ball_info.angle = Math.sin(angle) * 50 + 90;
+            };
+        }
+    };
+    function keyup(event) {
+      if (event.keyCode == 38) {
+        PLAYER_KEYDOWN.ArrowUp = false;
+      }
+      if (event.keyCode == 40) {
+        PLAYER_KEYDOWN.ArrowDown = false;
+      }
+    }
+    window.addEventListener("keydown", keydown);
+    window.addEventListener("keyup", keyup);
+    function keydown(event) {
+      if (event.keyCode == 38) {
+        PLAYER_KEYDOWN.ArrowUp = true;
+      };
+      if (event.keyCode == 40) {
+        PLAYER_KEYDOWN.ArrowDown = true;
+      };
+    }
+    setInterval(animate, 1000 / 20);
+  </script>
+</html>
